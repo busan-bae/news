@@ -1,46 +1,65 @@
-// const API_KEY = '018d646d760646b3a98b1048c372fd05'
-let PAGE_SIZE = 20
+// const API_KEY = '018d646d760646b3a98b1048c372fd05'  //5삭제
+const pageSize = 10
 let newsList =[]
 const topMenus = document.querySelectorAll(".menus button")
 const sideMenus = document.querySelectorAll(".side-menu button")
 const searchInput = document.getElementById("search-input")
+let totalResults = 0
+let page = 1
+const groupSize = 5
+
+let usr = new URL(`
+    https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&pageSize=${pageSize}`)
+    //https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`)
 
 topMenus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event)))
 sideMenus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event)))
 
+
+const getNews = async () => {
+    try{
+        const response = await fetch(url)
+        const data = await response.json() 
+        if(response.status === 200){
+            if(data.articles.length===0){
+                throw new Error("No result for this Search")
+            }
+            newsList = data.articles 
+            totalResults = data.totalResults
+            render()
+            // paginationRender()
+        } else {
+            throw new Error(data.message)
+        }      
+    }catch(error){
+    errorRender(error.message)
+    }
+}
+
 const searchNews = async () => {
     const keyword = searchInput.value
-    const url = new URL (`
-        https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&pageSize=${PAGE_SIZE}`)
-        //  https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${API_KEY}`)
-    const response = await fetch(url)
-    const data = await response.json()
-    newsList = data.articles
-    render()
+    url = new URL (`
+        https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&pageSize=${pageSize}`)
+        //https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${API_KEY}`)
+    getNews()
 }
 
 
 const getNewsByCategory = async (event) => {
     const category = event.target.textContent.toLowerCase()
-    const url = new URL (`
-        https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&pageSize=${PAGE_SIZE}`)
-        // https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`)
-    const response = await fetch(url)
-    const data = await response.json()
-    newsList = data.articles
-    render()
+    url = new URL (`
+        https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&pageSize=${pageSize}`)
+        //https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`)
+        getNews()    
 }
 
 
 const getLatestNews = async () => {
-    const url = new URL(
-        `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&pageSize=${PAGE_SIZE}`
-        // `https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`
+    url = new URL(
+        `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&pageSize=${pageSize}`
+        //`https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`
     );
-    const response = await fetch(url)
-    const data = await response.json()
-    newsList = data.articles
-    render()
+    getNews()
 }
 
 getLatestNews()
@@ -75,6 +94,24 @@ const render = () => {
     document.getElementById("news-board").innerHTML = newsHTML
 }
 
+const errorRender = (errorMessage) => {
+    const errorHTML = `<div class="alert alert-danger" role="alert">
+  ${errorMessage}
+</div>`
+document.getElementById("news-board").innerHTML=errorHTML
+}
+
+const paginationRender=()=>{
+    const pageGroup = Math.ceil(page/groupSize)
+    const lastPage = pageGroup * groupSize
+    const firstPage = lastPage = (groupSize - 1)
+
+    let paginationHTML=``
+    for(let i = firstPage; i<=lastPage;i++){
+        paginationHTML+=`<li class="page-item"><a class="page-link" href="#">${i}</a></li>`
+    }
+    document.querySelector(".pagination").innerHTML=paginationHTML
+}
 
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
