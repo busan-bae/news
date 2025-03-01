@@ -14,7 +14,12 @@ let usr = new URL(`
 
 topMenus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event)))
 sideMenus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event)))
-
+searchInput.addEventListener("keyup",function(event){
+    if(event.key === "Enter" ){
+        event.preventDefault();
+        searchNews()
+    }
+})
 
 const getNews = async () => {
     try{

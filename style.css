@@ -131,3 +131,10 @@
     display: none;
     margin-top: 15px;
   }
+
+.pagination { 
+  user-select: none;
+  cursor: pointer;
+  margin-top: 10px;
+  justify-content: center;
+}
