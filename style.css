@@ -138,3 +138,7 @@
   margin-top: 10px;
   justify-content: center;
 }
+
+.head-line {
+  cursor: pointer;
+}

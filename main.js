@@ -33,6 +33,7 @@ const getNews = async () => {
             }
             newsList = data.articles 
             totalResults = data.totalResults
+            // console.log(totalResults)
             render()
             paginationRender()
         } else {
@@ -48,6 +49,7 @@ const searchNews = async () => {
     url = new URL (`
         https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&pageSize=${pageSize}`)
         //https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${API_KEY}`)
+    page = 1
     getNews()
 }
 
@@ -57,7 +59,8 @@ const getNewsByCategory = async (event) => {
     url = new URL (`
         https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&pageSize=${pageSize}`)
         //https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`)
-        getNews()    
+    page = 1
+    getNews()    
 }
 
 
@@ -66,6 +69,7 @@ const getLatestNews = async () => {
         `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&pageSize=${pageSize}`
         //`https://newsapi.org/v2/top-headlines?country=us&apiKey=${API_KEY}`
     );
+    page = 1
     getNews()
 }
 
@@ -116,12 +120,19 @@ const paginationRender=()=>{
         lastPage=totalPages
     }
     const firstPage = lastPage - (groupSize - 1)<=0? 1: lastPage - (groupSize - 1) ;
-        let paginationHTML=`<li class="page-item" onclick="moveToPage(${page-1})"><a class="page-link">Previous</a></li>`
+    let paginationHTML = ''
+    if(page > 1){
+        paginationHTML=`<li class="page-item" onclick="moveToPage(${1})"><a class="page-link">&lt;&lt;</a></li>
+        <li class="page-item" onclick="moveToPage(${page-1})"><a class="page-link">&lt;</a></li>`
+    } 
     for(let i=firstPage; i<=lastPage;i++){
         paginationHTML+=`<li class="page-item ${
             i===page?"active":""}" onclick="moveToPage(${i})"><a class="page-link">${i}</a></li>`
+        }
+    if(page < totalPages){
+        paginationHTML += `<li class="page-item" onclick="moveToPage(${page+1})"><a class="page-link">&gt;</a></li>
+        <li class="page-item" onclick="moveToPage(${totalPages})"><a class="page-link">&gt;&gt;</a></li>`          
     }
-    paginationHTML += `<li class="page-item" onclick="moveToPage(${page+1})"><a class="page-link">Next</a></li>`
     document.querySelector(".pagination").innerHTML=paginationHTML
 }
 
